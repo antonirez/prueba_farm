@@ -15,17 +15,29 @@ services:
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
 
-    # makes classes in src/ available to be used as services
-    # this creates a service per class whose id is the fully-qualified class name
-    App\:
-        resource: '../src/*'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
-
-    # controllers are imported separately to make sure services can be injected
-    # as action arguments even if you don't extend any base controller class
-    App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
-
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    app.provider.smtp:
+        class: App\Provider\SmtpProvider
+        public: true
+
+    app.provider.ses:
+        class: App\Provider\SesProvider
+        public: true
+
+    app.service.notification.smtp:
+        class: App\Service\NotificationService
+        public: true
+        calls:
+            - [setSmtp, ['@app.provider.smtp']]
+
+    app.service.notification.ses:
+        class: App\Service\NotificationService
+        public: true
+        calls:
+            - [setSes, ['@app.provider.ses']]
+
+    console.command:
+        class: App\Command\SendNotificationCommand
+        public: true
