@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Provider\SmtpProvider;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,8 +21,12 @@ class UserController extends AbstractController
      */
     public function sendNotification($id)
     {
+        //Establezco el proveedor de envío
+        $mailerProvider = new SmtpProvider();
+        $this->container->set('app.provider.mailer_provider', $mailerProvider);
+
         //Creo el servicio de notificación
-        $notificationService = $this->get('app.service.notification.smtp');
+        $notificationService = $this->get('app.service.notification');
 
         //Creo usuario. En esta prueba el usuario siempre tiene ID 1
         $user = new User();

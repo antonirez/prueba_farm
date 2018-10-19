@@ -11,32 +11,20 @@ services:
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
-        public: false       # Allows optimizing the container by removing unused services; this also means
+        public: true       # Allows optimizing the container by removing unused services; this also means
                             # fetching services directly from the container via $container->get() won't work.
                             # The best practice is to be explicit about your dependencies anyway.
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
 
-    app.provider.smtp:
-        class: App\Provider\SmtpProvider
-        public: true
+    app.provider.mailer_provider:
+        class: App\Provider\MailerProviderInterface
+        synthetic: true
 
-    app.provider.ses:
-        class: App\Provider\SesProvider
-        public: true
-
-    app.service.notification.smtp:
+    app.service.notification:
         class: App\Service\NotificationService
-        public: true
-        calls:
-            - [setSmtp, ['@app.provider.smtp']]
-
-    app.service.notification.ses:
-        class: App\Service\NotificationService
-        public: true
-        calls:
-            - [setSes, ['@app.provider.ses']]
+        arguments: ['@app.provider.mailer_provider']
 
     console.command:
         class: App\Command\SendNotificationCommand

@@ -7,21 +7,13 @@
 namespace App\Service;
 
 use App\Entity\User;
-use App\Provider\SesProvider;
-use App\Provider\SmtpProvider;
+use App\Provider\MailerProviderInterface;
 
 class NotificationService
 {
     private $mailerProvider;
 
-    //Establece proveedor de envío a smtp
-    public function setSmtp(SmtpProvider $mailerProvider)
-    {
-        $this->mailerProvider = $mailerProvider;
-    }
-
-    //Establece proveedor de envío a ses
-    public function setSes(SesProvider $mailerProvider)
+    public function __construct(MailerProviderInterface $mailerProvider)
     {
         $this->mailerProvider = $mailerProvider;
     }

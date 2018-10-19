@@ -3,6 +3,7 @@
 namespace App\Command;
 
 use App\Entity\User;
+use App\Provider\SesProvider;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,10 +26,18 @@ class SendNotificationCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $io = new SymfonyStyle($input, $output);
+
+        $container = $this->getApplication()->getKernel()->getContainer();
+
+        //Guardo el argumento user_id
         $userId = $input->getArgument('user_id');
 
+        //Establezco el proveedor de envío
+        $mailerProvider = new SesProvider();
+        $container->set('app.provider.mailer_provider', $mailerProvider);
+
         //Creo el servicio de notificación
-        $notificationService = $this->getApplication()->getKernel()->getContainer()->get('app.service.notification.ses');
+        $notificationService = $container->get('app.service.notification');
 
         //Creo usuario. En esta prueba el usuario siempre tiene ID 1
         $user = new User();
